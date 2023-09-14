@@ -6,8 +6,8 @@
 
 #USER CONFIG
 #Path and names
-from_backup_path="mega_www_dir" #Use absolette path or name of working directory! (site_dir, /home/site/dir)
-to_backup_path=${1%/}
+from_backup_path=${1%/} #Use absolute path or name of working directory! (site_dir, /home/site/dir)
+to_backup_path=${2%/} #Use absolute path or name of working directory! (site_dir, /home/site/dir)
 #Number of backups to store
 daily_store=6
 weekly_store=4
@@ -20,7 +20,7 @@ yearly_backup_month="Dec"
 monthly_backup="01"
 weekly_backup="Sun"
 #Help message
-usage="USAGE: $0 /path/to/backup/directory"
+usage="USAGE: $0 /path/to/your_files /path/to/backup_dir
 #Compress programs
 tar_programm="tar"
 zip_programm="gzip"
@@ -28,21 +28,25 @@ zip_programm="gzip"
 backup_log="backup_mega.log"
 backup_err="backup_mega.err"
 
-echo "Working directory set: $from_backup_path"
+
 
 #Check for argument (backup dir)
-if [[ -z $1 ]]; then
-    echo "Error. Missing argument.(backup directory)"
+if [[ -z $1 || -z $2 ]]; then
+    echo "Error. Missing arguments. (/from/your_files /to/backup_dir)"
     echo $usage
     exit
 elif [[ ! -d $1 || ! -e $1 ]]; then
-    echo "Error. This is NOT a directory or directory not exist"
+    echo "Error. Your directory not set or not exist (backup from?)"
     echo $usage
     exit
-elif [[ ! -d $from_backup_path || ! -e $from_backup_path ]]; then
-    echo "Error. Working directory not set or not exist! See USER CONFIG."
+elif [[ ! -d $2 || ! -e $2 ]]; then
+    echo "Error. Backup directory not set or not exist! (backup to?)"
+    echo $usage
     exit
 fi
+
+echo "Backuping directory: $from_backup_path"
+echo "Store backups in: $to_backup_path"
 
 #VARS (DO NOT EDIT)
 dir_name=$(basename $from_backup_path)
