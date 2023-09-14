@@ -20,15 +20,13 @@ yearly_backup_month="Dec"
 monthly_backup="01"
 weekly_backup="Sun"
 #Help message
-usage="USAGE: $0 /path/to/your_files /path/to/backup_dir
+usage="USAGE: $0 /path/to/your_files /path/to/backup_dir"
 #Compress programs
 tar_programm="tar"
 zip_programm="gzip"
 #Logs
 backup_log="backup_mega.log"
 backup_err="backup_mega.err"
-
-
 
 #Check for argument (backup dir)
 if [[ -z $1 || -z $2 ]]; then
