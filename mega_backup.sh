@@ -22,8 +22,7 @@ weekly_backup="Sun"
 #Help message
 usage="USAGE: $0 /path/to/your_files /path/to/backup_dir"
 #Compress programs
-tar_programm="tar"
-zip_programm="gzip"
+zip_programm="gzip" # gzip OR bzip2 only supported!
 #Logs
 backup_log="backup_mega.log"
 backup_err="backup_mega.err"
@@ -32,15 +31,15 @@ backup_err="backup_mega.err"
 if [[ -z $1 || -z $2 ]]; then
     echo "Error. Missing arguments. (/from/your_files /to/backup_dir)"
     echo $usage
-    exit
+    exit 1
 elif [[ ! -d $1 || ! -e $1 ]]; then
     echo "Error. Your directory not set or not exist (backup from?)"
     echo $usage
-    exit
+    exit 1
 elif [[ ! -d $2 || ! -e $2 ]]; then
     echo "Error. Backup directory not set or not exist! (backup to?)"
     echo $usage
-    exit
+    exit 1
 fi
 
 echo "Backuping directory: $from_backup_path"
@@ -58,16 +57,16 @@ date_format="($day_of_week $day $month $year)"
 
 #FUNCTIONS
 
- #Main backup func
+#Main backup func
 backup_add () {
 
     #Check for tar/zip programm is installed
-    if [[ ! -e $(which $tar_programm) ]]; then
-	echo "Sorry, but $tar_programm does not exist."
-	exit
-    elif [[ ! -e $(which $zip_programm) ]]; then
+    if ! $(command -v tar &> /dev/null); then
+	echo "Sorry, but TAR does not exist."
+	exit 1
+    elif ! $(command -v $zip_programm &> /dev/null); then
 	echo "Sorry, but $zip_programm does not exist."
-	exit
+	exit 1
     fi
 
     case $1 in
@@ -89,7 +88,16 @@ backup_add () {
     ;;
     esac
     
-    local backup_name=$(date +%Y-%m-%d-%H-%M-%S)-$dir_name.tar.gz
+    case $zip_programm in
+    "gzip")
+    local zip_file="gz"
+    ;;
+    "bzip2")
+    local zip_file="bz2"
+    ;;
+    esac
+
+    local backup_name=$(date +%Y-%m-%d-%H-%M-%S)-$dir_name.tar.$zip_file
     local backup_full_path=$to_backup_path"/"$backup_format"/"$backup_name
 
     if [[ ! -e $to_backup_path"/"$backup_format ]]; then
@@ -99,17 +107,12 @@ backup_add () {
 
     #Main working program
     echo "Working.."
-    $(tar -czf $backup_full_path $from_backup_path >>$backup_log 2>$backup_err)
-    tar_status=$?
+    $(tar -cf - $from_backup_path 2>>$backup_err | $zip_programm > $backup_full_path 2>>$backup_err)
+    zip_status=$?
 
-    if [[ $tar_status -ne 0 ]]; then
+    if [[ $zip_status -ne 0 || ! -s $backup_full_path ]]; then
 	echo "Error. See $backup_err for more info"
-	exit
-    fi
-
-    if [[ ! -e $backup_full_path ]]; then
-	echo "Error. See $backup_err for more info"
-	exit
+	exit 1
     fi
 
     echo "Job done. Backup $backup_full_path created."
@@ -117,6 +120,8 @@ backup_add () {
 
 #Clean backups func
 backup_clean () {
+
+echo "Start cleaning $to_backup_path"
 
 for b_format in ${BACKUPS[@]}; do
     full_b_path=$to_backup_path"/"$b_format
