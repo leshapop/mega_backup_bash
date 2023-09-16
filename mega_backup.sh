@@ -16,9 +16,9 @@ yearly_store=1
 BACKUPS=(daily weekly monthly yearly)
 #Backup timings prio (Yearly->Monthly->Weekly->daily)
 yearly_backup="31"
-yearly_backup_month="Dec"
+yearly_backup_month="12" #December
 monthly_backup="01"
-weekly_backup="Sun"
+weekly_backup="7" #Sunday
 #Help message
 usage="USAGE: $0 /path/to/your_files /path/to/backup_dir"
 #Compress programs
@@ -49,11 +49,12 @@ echo "Store backups in: $to_backup_path"
 dir_name=$(basename $from_backup_path)
 
 #Date and time vars
-day_of_week=$(date +%a)
+day_of_week=$(date +%u)
+day_of_week2=$(date +%a)
 day=$(date +%d)
-month=$(date +%b)
+month=$(date +%m)
 year=$(date +%Y)
-date_format="($day_of_week $day $month $year)"
+date_format="($day_of_week2 $day.$month.$year)"
 
 #FUNCTIONS
 
