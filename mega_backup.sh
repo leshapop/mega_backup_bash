@@ -47,7 +47,6 @@ echo "Store backups in: $to_backup_path"
 
 #VARS (DO NOT EDIT)
 dir_name=$(basename $from_backup_path)
-
 #Date and time vars
 day_of_week=$(date +%u)
 day_of_week2=$(date +%a)
@@ -57,9 +56,8 @@ year=$(date +%Y)
 date_format="($day_of_week2 $day.$month.$year)"
 
 #FUNCTIONS
-
 #Main backup func
-backup_add () {
+backup_add() {
 
     #Check for tar/zip programm is installed
     if ! $(command -v tar &> /dev/null); then
@@ -71,31 +69,31 @@ backup_add () {
     fi
 
     case $1 in
-    "weekly")
-    local backup_format="$1"
-    echo "This is $1 backup. $date_format"
-    ;;
-    "monthly")
-    local backup_format="$1"
-    echo "This is $1 backup. $date_format"
-    ;;
-    "yearly")
-    local backup_format="$1"
-    echo "This is $1 backup. $date_format"
-    ;;
-    *)
-    local backup_format="daily" #Daily by default
-    echo "This is daily backup. $date_format"
-    ;;
+      "weekly")
+	local backup_format="$1"
+        echo "This is $1 backup. $date_format"
+        ;;
+      "monthly")
+	local backup_format="$1"
+	echo "This is $1 backup. $date_format"
+	;;
+      "yearly")
+	local backup_format="$1"
+        echo "This is $1 backup. $date_format"
+	;;
+      *)
+        local backup_format="daily" #Daily by default
+	echo "This is daily backup. $date_format"
+        ;;
     esac
     
     case $zip_programm in
-    "gzip")
-    local zip_file="gz"
-    ;;
-    "bzip2")
-    local zip_file="bz2"
-    ;;
+      "gzip")
+	local zip_file="gz"
+        ;;
+      "bzip2")
+        local zip_file="bz2"
+	;;
     esac
 
     local backup_name=$(date +%Y-%m-%d-%H-%M-%S)-$dir_name.tar.$zip_file
@@ -120,10 +118,9 @@ backup_add () {
 }
 
 #Clean backups func
-backup_clean () {
+backup_clean() {
 
 echo "Start cleaning $to_backup_path"
-
 for b_format in ${BACKUPS[@]}; do
     full_b_path=$to_backup_path"/"$b_format
     if [[ -e $full_b_path && -d $full_b_path ]]; then
@@ -151,7 +148,7 @@ for b_format in ${BACKUPS[@]}; do
     fi
 
     else
-    echo "$full_b_path not exist. Skip..."
+        echo "$full_b_path not exist. Skip..."
     fi
 done
 }
